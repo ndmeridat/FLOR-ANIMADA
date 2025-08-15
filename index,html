@@ -1,0 +1,138 @@
+body {
+    margin: 0;
+    background: #ffe6f0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+canvas {
+    background: #ffe6f0;
+}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rosa Animada</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <canvas id="rosaCanvas"></canvas>
+    <script src="script.js"></script>
+</body>
+</html>
+
+const canvas = document.getElementById("rosaCanvas");
+const ctx = canvas.getContext("2d");
+
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+let petalos = 0;
+const maxPetalos = 200;
+const velocidadPetalos = 0.05;
+
+let crecimientoTallo = 0;
+const alturaMaxTallo = 250;
+const velocidadTallo = 2;
+
+function dibujarTalloYHojas() {
+    const centroX = canvas.width / 2;
+    const centroY = canvas.height / 2;
+
+    // Tallo
+    ctx.beginPath();
+    ctx.moveTo(centroX, centroY);
+    ctx.lineTo(centroX, centroY + crecimientoTallo);
+    ctx.strokeStyle = "green";
+    ctx.lineWidth = 10;
+    ctx.stroke();
+
+    // Hojas (aparecen cuando el tallo crece)
+    if (crecimientoTallo > alturaMaxTallo / 3) {
+        ctx.beginPath();
+        ctx.ellipse(
+            centroX - 40,
+            centroY + crecimientoTallo / 2,
+            40,
+            20,
+            Math.PI / 4,
+            0,
+            Math.PI * 2
+        );
+        ctx.fillStyle = "green";
+        ctx.fill();
+    }
+
+    if (crecimientoTallo > (2 * alturaMaxTallo) / 3) {
+        ctx.beginPath();
+        ctx.ellipse(
+            centroX + 40,
+            centroY + crecimientoTallo / 1.5,
+            40,
+            20,
+            -Math.PI / 4,
+            0,
+            Math.PI * 2
+        );
+        ctx.fillStyle = "green";
+        ctx.fill();
+    }
+}
+
+function dibujarRosa(k) {
+    const centroX = canvas.width / 2;
+    const centroY = canvas.height / 2;
+    const escala = 150;
+
+    ctx.strokeStyle = "deeppink";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+
+    for (let angulo = 0; angulo < Math.PI * 2 * petalos; angulo += 0.01) {
+        let r = escala * Math.cos(k * angulo);
+        let x = centroX + r * Math.cos(angulo);
+        let y = centroY + r * Math.sin(angulo);
+        ctx.lineTo(x, y);
+    }
+
+    ctx.stroke();
+
+    // Centro amarillo
+    ctx.beginPath();
+    ctx.arc(centroX, centroY, 15, 0, Math.PI * 2);
+    ctx.fillStyle = "#ffcc00";
+    ctx.fill();
+}
+
+function animar() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Crecer tallo primero
+    if (crecimientoTallo < alturaMaxTallo) {
+        crecimientoTallo += velocidadTallo;
+    }
+
+    dibujarTalloYHojas();
+
+    // Luego crecer pétalos
+    if (crecimientoTallo >= alturaMaxTallo / 2 && petalos < maxPetalos) {
+        petalos += velocidadPetalos;
+    }
+
+    dibujarRosa(4);
+
+    requestAnimationFrame(animar);
+}
+
+animar();
+
+
+// Texto personalizado
+ctx.font = "bold 30px Arial";
+ctx.fillStyle = "darkgreen";
+ctx.textAlign = "center";
+ctx.fillText("Para ti con cariño ❤️", canvas.width / 2, canvas.height - 50);
